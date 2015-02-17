@@ -1,0 +1,180 @@
+\section{Details of the Alternating Direction Method}
+\label{appendix:adm}
+
+Each iteration of the Alternating Direction Method involves the
+following steps:
+\begin{senumerate}
+\item Find $X$ to minimize the augmented Lagrangian function\\
+  $\mathcal{L}(X,\{X_k\},Y,Y_0,Z,W,M,\{M_k\},N,\mu)$ with other
+  variables fixed. Removing the fixed terms, the objective is:
+\[
+\text{minimize:}~~ \alpha\|X\|_* + \frac{\mu}{2} \sum_{k=0}^K
+\|X_k+M_k/\mu - X\|_F^2.
+\]
+Let $J = \frac{1}{K+1}\sum_{k=0}^K (X_{k} + M_{k}/\mu)$, and
+$t = \frac{\alpha/\mu}{K+1}$. We can simplify the objective to the following:
+\[
+\text{minimize:}~~ t\|X\|_* + 1/2\|X - J\|_F^2.
+\]
+According to matrix completion literature, this is a standard
+nuclear norm minimization problem and can be solved by applying
+soft thresholding on the singular values of $J$. Specifically, 
+we have:
+\[
+X = \mathsf{SVSoftThresh}(J,t).
+\]
+For a given $J$ and $t$, let $J=U S V^T$ be the singular value
+decomposition of $J$.  We have: $\mathsf{SVSoftThresh}(J,t)\defas U
+\mathsf{SoftThresh}(S,t) V^T$, where
+\[
+\mathsf{SoftThresh}(S[i,j],t) \defas \mathsf{sign}(S[i,j])
+\max(0, |S[i,j]|-t).
+\]
+
+
+\item Find $X_{k}$ to minimize
+$\mathcal{L}(X,\{X_k\},Y,Y_0,Z,W,M,\{M_k\},N,\mu)$ with other
+variables fixed $(k = 1,2,...,K)$. This gives:
+\[
+\text{minimize:}~\frac{\gamma}{2\sigma} \|P_k X_k Q_k^T-R_k\|_F^2 + \frac{\mu}{2} \|X_k+M_k/\mu-X\|_F^2.
+\]
+This is a least square problem with respect to $X_k$.  The
+optimal solution can be obtained by forcing the gradient of the
+objective to be zero. That is,
+\begin{equation}
+\frac{\gamma}{\sigma} P_{k}^T (P_{k} X_{k} Q_{k}^T-R_{k})Q_{k}^T + \mu (X_{k}+M_{k}/\mu-X) = 0.
+\label{eqn:gradient}
+\end{equation}
+Let $J = X-M_{k}/\mu$, and $R = P_{k}^T R_{k} Q_{k} + \frac{\mu\sigma}{\gamma}
+J$.
+Eq.~\eqref{eqn:gradient} simplifies to
+\begin{equation}
+P_k^T P_k X_k Q_k^T Q_k + \frac{\mu\sigma}{\gamma} X_k = R.
+\label{eqn:simple}
+\end{equation}
+Perform eigendecomposition on $P_k^T P_k$ and $Q_k^T Q_k$ and let
+$USU^T = P_{k}^T P_{k}$; $VTV^T = Q_{k}^T Q_{k}$, where $U$ and $V$
+are orthogonal matrices, $S$ and $T$ are diagonal matrices.  We have:
+$S(U^T X_k V)T + \frac{\mu\sigma}{\gamma} (U^T X_k V) = U^T R V$.  Through a
+change of variable, let $H = U^T X_k V$, Eq.~\eqref{eqn:simple}
+becomes:
+\begin{equation}
+  SHT + \frac{\mu\sigma}{\gamma} H = U^T R V.
+\label{eqn:STR}
+\end{equation}
+Let $\mathbf{s} = diag(S)$, $\mathbf{t} = diag(T)$ be the diagonal
+vector of $S$ and $T$, respectively.  Eq.~\eqref{eqn:STR} is
+equivalent to $(\mathbf{s} \mathbf{t}^T+\frac{\mu\sigma}{\gamma}).*H = U^TRV$.
+Since $U$ and $V$ are orthogonal matrices, we can easily find $X_k$
+from $H$ as $X_k=U H V^T$.  So we have: \( H = (U^TRV)./(\mathbf{s}
+\mathbf{t}^T+\frac{\mu\sigma}{\gamma}) \), where $./$ is an operator for
+element-wise division.  Thus,
+\[X_k = U H V^T = U\left((U^TRV)./(\mathbf{s}
+\mathbf{t}^T+\frac{\mu\sigma}{\gamma})\right)V^T.\]
+
+\item Find $X_{0}$ to minimize
+  $\mathcal{L}(X,\{X_k\},Y,Y_0,Z,W,M,\{M_k\},N,\mu)$ with other
+  variables fixed $(k = 1,2,...,K)$. This gives:
+\begin{eqnarray}
+  \text{minimize:} && \langle M,D-A X_{0}-BY_0-CZ-W \rangle\nonumber\\
+  && + \langle M_{0},X_{0}-X \rangle\nonumber\\
+  && + \mu/2 \|D-AX_{0}-BY_0-CZ-W\|_F^2\nonumber\\
+  && + \mu/2 \|X_{0}-X\|_F^2\nonumber
+  %\label{eqn:Xa_1}
+\end{eqnarray}
+
+That is,
+\begin{eqnarray}
+  \text{minimize:} && \|X_{0}-X+M_{0}/\mu\|_F^2 \nonumber\\
+  && + \|D-BY_0-CZ-W+M/\mu - AX_{0}\|_F^2\nonumber
+\end{eqnarray}
+
+Let $J_0=X-M_{0}/\mu$ and $J=D-BY_0-CZ-W+M/\mu$.  It becomes:
+\[
+  \text{minimize:} \|X_{0}-J_0\|_F^2 + \|AX_{0}-J\|_F^2
+\]
+Letting the gradient be zero leads to:
+$X_{0}-J_0 + A^T(A X_{0}-J) = 0.$
+Therefore,
+$X_{0} = \mathrm{inv}(A^T A+I)  (A^T J + J_0).$
+         
+\item Find $Y$ to minimize
+$\mathcal{L}(X,\{X_k\},Y,Y_0,Z,W,M,\{M_k\},N,\mu)$ with other
+variables fixed. This gives:
+\begin{eqnarray}
+  \text{minimize:} \beta\|Y\|_1 + \langle N,Y_0-Y\rangle + \mu/2 \|Y_0-Y\|_F^2\nonumber
+\end{eqnarray} 
+That is:
+\begin{eqnarray}
+  \text{minimize:} \beta/\mu \|Y\|_1 + 1/2 \|Y_0+N/\mu-Y\|_F^2.\nonumber
+\end{eqnarray}
+Let $J = Y_0+N/\mu$.  $t = \beta/\mu$.  It becomes: $t\|Y\|_1
++ 1/2\|J-Y\|_F^2$.  This can be easily solved as $Y =
+\mathsf{SoftThresh}(J,t)$.  To see why, the problem can be solved for each
+element of $Y$ separately.  So we just need to find $Y[i,j]$ that
+minimizes: $t|Y[i,j]| + 1/2(J[i,j]-Y[i,j])^2$.
+
+\item Find $Y_0$ to minimize
+$\mathcal{L}(X,\{X_k\},Y,Y_0,Z,W,M,\{M_k\},N,\mu)$ with other
+variables fixed. This gives:
+\begin{eqnarray}
+  \text{minimize:} && \langle M,D-AX_{0}-BY_0-CZ-W\rangle \nonumber\\
+&&    + \langle N,Y_0-Y\rangle\nonumber\\
+&&    + \mu/2 \|D-AX_{0}-BY_0-CZ-W\|_F^2\nonumber\\
+&&    + \mu/2 \|Y_0-Y\|_F^2\nonumber
+\end{eqnarray}  
+Let $J_0 = Y-N/\mu$, $J=D-AX_{0}-CZ-W+M/\mu$.  It becomes
+%\begin{eqnarray}
+$\text{minimize:}~\|Y_0-J_0\|_F^2 + \|BY_0-J\|_F^2$
+%\end{eqnarray}
+Letting the gradient = 0, we obtain:
+%\begin{eqnarray}
+$Y_0-J_0 + B^T(BY_0-J) = 0.$
+%\end{eqnarray}
+So $Y_0 = \mathrm{inv}(B^TB+I) (B^TJ + J_0).$
+
+\item Find $Z$ to minimize
+$\mathcal{L}(X,\{X_k\},Y,Y_0,Z,W,M,\{M_k\},N,\mu)$ with other
+variables fixed. This gives:
+\begin{eqnarray}
+  \text{minimize:} && \frac{1}{2\sigma} \|Z\|_F^2 + \langle M,D-AX_{0}-BY_0-CZ-W\rangle \nonumber\\
+&&    + \frac{\mu}{2} \|D-AX_{0}-BY_0-CZ-W\|_F^2.\nonumber
+\end{eqnarray}
+Let $J = D-AX_0-BY_0-W+M/\mu$, it becomes:
+\[\frac{1}{2\mu\sigma} \|Z\|_F^2 + \frac{1}{2} \|CZ-J\|_F^2.\]
+
+Letting the gradient = 0 yields:
+$Z = \mathrm{inv}(\frac{1}{\mu\sigma} I + C^TC) (C^T J)$.
+
+\item Find $W$ to minimize
+$\mathcal{L}(X,\{X_k\},Y,Y_0,Z,W,M,\{M_k\},N,\mu)$ with other
+variables fixed. This gives:
+\begin{eqnarray*}
+\text{minimize:} && \langle M, D-AX_0-BY_0-CZ-W \rangle \\
+                 && + \mu/2\|D-AX_0-BY_0-CZ-W\|_F^2.
+\end{eqnarray*}
+That is:
+\[
+\text{minimize:~} \|D-AX_0-BY_0-CZ-W+M/\mu\|_F^2 
+\]
+So $W = E.*(D-AX_0-BY_0-CZ+M/\mu)$ (recall that $W=E.*W$).
+
+\item Update estimate for $\sigma_D$ as follows.  Let
+  $J=D-AX_0-BY_0-W$.  We then compute $\sigma_D$ as the standard
+  deviation of $J[E=0]$ and update $\sigma = \theta \sigma_D$.  In our
+  implementation, we fix $\theta=10$.
+
+  
+\item Update estimates for the Lagrangian multipliers $M$, $M_k$ and
+  $N$ according to:
+$M = M + \mu\cdot (D-AX_0-BY_0-CZ-W)$, $M_k = M_k + \mu\cdot (X_k-X)$
+  ($k=0,\cdots,K$), $N = N + \mu\cdot (Y_0-Y)$.
+
+\item Update $\mu = \mu \cdot \rho$.  In our implementation, initially
+  $\mu = 1.01$ and $\rho = 1.01$.  Every $100$ iterations, we multiply
+  $\rho$ by $1.05$.
+  
+\end{senumerate}
+
+
+

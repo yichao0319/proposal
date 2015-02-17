@@ -1,0 +1,86 @@
+\chapter{Introduction}
+\index{Introduction@\emph{Introduction}}%
+\label{sec:intro}
+
+
+\section{Motivation}
+\label{sec:intro_motivation}
+
+Wireless networks and sensor networks are constantly generating an enormous amount of rich and diverse information. Such information creates exciting opportunities for network analytics. Network analytics can provide deep insights into the complex interactions among network entities, and has a wide range of applications in wireless networks across all protocol layers. Example applications include spectrum sensing, channel estimation, channel feedback compression, multi-access channel design, data aggregation, network coding, wireless video coding, anomaly detection, activity recognition, and localization.
+
+
+\section{Challenges}
+\label{sec:intro_challenge}
+
+% A major challenge to enable effective network analytics is how to distinguish inherent data properties from variability introduced by the environment, measurement errors, artifacts, and anomalies. The presence of missing data can further complicate network analytics. 
+There are many challenges to enable effective network analytics:
+
+\para{Under-constraint}: The number of unknown factors for network analytics can be much larger than the number of measurements we made. For example, traffic engineering requires knowing the complete traffic matrix between all source and destination pairs in order to properly provision traffic and avoid congestion. However, it's very expensive, if not infeasible, to measures the traffic between all source and destination pairs. Reconstructing data from few measurements is an under-constrained problem. 
+
+\para{Over-fitting}: Even we are fortunate to have enough measurements, network analytics can still be challenging because it may try to describe the biased measurements or random noise instead of the underlying relationship. In other words, there can be over-fitting issues.
+
+\para{Noise, Errors, and Anomalies}: Noise, erroneous data, and anomalies are common in real-world network data. It is challenging to distinguish genuine network structure and behavior of interest from anomalies and measurement imperfections in a robust and accurate fashion. 
+
+\section{Compressive Sensing}
+\label{sec:compressive_sensing}
+
+Compressive sensing is an effective technique to network analytics. It leverages the presence of structure and redundancy in real data for interpolation and analysis. It has recently attracted considerable attention in statistics, approximation theory, information theory, and signal processing. Several effective heuristics have been proposed to explicitly exploit the sparse or low-rank nature of empirically obtained matrices (\ie, a matrix can be approximated as a product of two factor matrices with few columns). Meanwhile, the mathematical theory of compressive sensing has also advanced to the point where the optimality of many of these heuristics has been proven under certain technical conditions on the matrices of interest.
+
+There are several advantages for applying compressive sensing to network analytics. 
+
+\begin{itemize}
+\item Recover missing data: Failures in measurement systems and network losses can also lead to missing data. On the other hand, many network tasks require complete data to operate properly. 
+
+\item Find the underlying data structure: Compressive sensing reconstruct data by utilizing the underlying data structure. By designing the penalty terms carefully, we can find the intrinsic trend in the data and avoid over-fitting. Moreover, we can also remove noise and detect anomalies in the data because the residual which is inconsistent with the underlying data structure can be identified. 
+
+\item Scalability and power efficiency: Compressive sensing requires few measurements to reconstruct the data so reduces the cost for measurement and data collection. This is important for network analytics to scale in large networks and save power in sensor or mobile networks. 
+\end{itemize}
+
+However, the immense complexity and heterogeneity of the real-world datasets imply that many assumptions and operational conditions required by existing compressive sensing techniques may not hold. In particular, our analysis show that many real network matrices are not low rank. Violation of low rank assumption significantly reduces the effectiveness of existing compressive sensing approaches. In the dissertation, we will first show how the compressive sensing technique can be applied to build systems to handle real-world network data. Then we develop a novel technique which explicitly accounts for anomalies, error, and noise in the data to make compressive sensing more robust. 
+
+
+\section{Approaches}
+\label{sec:approach}
+
+\para{Event Detection}: We first demostarte the feasibility of applying compressive sensing technique to detect events in a huge customer care calls dataset. 
+
+Customer care calls serve as a direct channel for a service provider to learn feedbacks from their customers. They reveal details about the nature and impact of major events and problems observed by customers. By analyzing the customer care calls, a service provider can detect important events to speed up problem resolution. However, automating event detection based on customer care calls poses several significant challenges. First, the relationship between customers’ calls and network events is blurred because customers respond to an event in different ways. Second, customer care calls can be labeled inconsistently across agents and across call centers, and a given event naturally give rise to calls spanning a number of categories. Third, many important events cannot be detected by looking at calls in one category. How to aggregate calls from different categories for event detection is important but challenging. Lastly, customer care call records have high dimensions (\eg, thousands of categories in our dataset).
+
+We propose a systematic method for detecting events in a major cellular network using customer care call data. It consists of three main components: (i) using a regression approach that exploits temporal stability and low-rank properties to automatically learn the relationship between customer calls and major events, (ii) reducing the number of unknowns by clustering call categories and using L1 norm minimization to identify important categories, and (iii) employing multiple classifiers to enhance the robustness against noise and different response time. For the detected events, we leverage Twitter social media to summarize them and to locate the impacted regions. We show the effectiveness of our approach using data from a large cellular service provider in the US.
+
+\para{Robust Compressive Sensing}: We then focus the fundamental part of compressive sensing. Our analysis show that many real network matrices are not low rank. Violation of low rank assumption significantly reduces the effectiveness of existing compressive sensing approaches. 
+
+There are different factors that contribute to the lack of low rank structure in real data: (i) presence of measurement errors, noise, and anomalies, (ii) lack of synchronization across measurements (\eg, the original matrix may not be low-rank because the start time of the measurements across different elements are different, but after aligning them up, the new matrix may become low-rank), and (iii) lack of uniform speed (\eg, the raw samples of the same gesture performed at different time may not be low-rank due to different speeds of performing the gesture, but become similar after adjusting their speeds to the common one), and the combinations of these factors.
+
+To address the first problem (\ie, presence of measurement errors, noise, and anomalies), we develop \textbf{\textit{LENS decomposition}}, a novel technique to accurately decompose network data represented in the form of a matrix into a low-rank matrix, a sparse anomaly matrix, an error term, and a small noise matrix. This decomposition naturally reflects the inherent structures of real-world data and is more general than existing compressive sensing techniques by removing the low-rank assumption and explicitly supporting anomalies. 
+
+We further generalize the problem to incorporate domain knowledge, such as temporal stability, spatial locality, and/or initial estimation (\eg, obtained from a model).
+We formulate this problem as a convex optimization problem, and develop an Alternating Direction Method (ADM) to efficiently solve it.
+
+Our approach has several nice properties: (i) it supports a wide range of matrices: with or without anomalies, and with or without low-rank structure, (ii) its parameters are either exactly computed or self tuned, (iii) it can incorporate domain knowledge, and (iv) it supports various network applications, such as missing value interpolation, prediction, and anomaly detection. 
+
+To address the second problem (\ie, lack of synchronization across measurements), we use cross correlation to identify the shift that maximizes correlation coefficient and then align the data according to the shift before further analysis. Note that the shift can be identified even when there are missing elements since cross correlation can be computed based on the known entries. To extend beyond two rows, we can first perform pairwise cross correlation and derive affinity matrix $A(i, j)$, where $(i, j)$-th entry denotes the cross correlation between the $i$-th and $j$-th elements. Then we use spectral clustering to cluster the data, where each cluster contains multiple rows. We then pick the best row such that the remaining rows after shifting can maximize the total cross correlation. The best row from each cluster represents a major feature and can be used for pattern matching. The insight that shifting may help reduce the rank of the matrix enables us to apply compressive sensing to matrices that are not close to low-rank in the original form.
+
+To address the third problem (\ie, lack of uniform speed), we can search for a scaling factor that maximizes the cross correlation between a pair of data. As in the second problem, we first cluster the data based on the affinity matrix derived after performing pairwise stretch/compression, and then find the representative for each cluster. 
+
+We evaluate LENS using a wide range of network matrices, including traffic matrices from 3G, WiFi, and the Internet, channel state information (CSI) matrices, RSSI matrices in WiFi and sensor networks, and expected transmission time (ETT) traces from UCSB Meshnet. Our results show that it significantly out-performs state-of-the-art compressive sensing methods including Sparsity Regularized Matrix Factorization (SRMF) under anomalies~\cite{zhang09sensing}. 
+
+
+\section{Summary of Contributions}
+\label{sec:contribution}
+
+In summary, here are the following major contributions:
+
+\begin{itemize}
+\item This thesis makes important observations that real-world datasets often are not low-rank due to (i) the presence of measurement errors, noise, and anomalies, (ii) lack of synchronization across measurements, and (iii) lack of uniform speed.
+
+\item proposes a robust compressive sensing technique for real-world network datasets which (i) finds the matrix transformations to synchronize data, and (ii) explicitly accounts for anomalies or measurement noise.
+
+\item advances the state-of-the-art approaches in anomaly detection, missing data interpolation, prediction, and activity recognition by applying robust network compressive sensing to these applications.
+
+\end{itemize}
+
+\section{Proposal Outline}
+
+Chapter~\ref{chp:related} overviews the related work. Chapter~\ref{chp:event-det} shows how we apply compressive sensing technique to build an anomaly detection system using customer care call dataset, Chapter~\ref{chp:robust-cs} details our approach to make compressive robust by decomposing a network matrix into a low-rank matrix, a sparse anomaly matrix, an error term, and a small noise matrix., Chapter~\ref{chp:generalized-cs} details our on-going work on finding matrix transformations to allow compressive sensing to deal with all types of network data. Chapter~\ref{chp:conclusion} presents the conclusions and on-going work.
+

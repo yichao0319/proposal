@@ -1,0 +1,135 @@
+\chapter{Related Work}
+\label{chp:related}
+\index{Related Work@\emph{Related Work}}%
+
+This chapter presents related work. Section~\ref{sec:rel_cs} presents the work related to compressive sensing, Section~\ref{sec:rel_diagnosis} describes the work in general network diagnosis and finally Section~\ref{sec:rel_anomaly_det} talks about anomaly detection. 
+
+\section{Compressive Sensing}
+\label{sec:rel_cs}
+
+LENS belongs to the realm of {\em compressive sensing}, a generic
+methodology for extracting and exploiting the presence of certain
+types of structure and redundancy in data from many real-world
+systems. Compressive sensing has recently attracted considerable
+attentions from statistics, approximation theory, information theory,
+and signal processing
+\cite{candes06:_compressive,donoho06:_compr_sensin,candes:_exact_matrix,recht:_guaran,recht08:_nec,zhang09sensing}
+and is rapidly becoming a vibrant research area of its own.
+
+Most existing compressive sensing works assume that the matrices
+satisfy low-rank property. However, this assumption may not hold. 
+Violation of such assumption significantly limits the accuracy of 
+these techniques. 
+
+Significant work has been done for solving
+under-determined linear inverse problems. Missing value interpolation,
+prediction, and network tomography can be cast into the same formulation.
+
+As described in \cite{ZRLD03}, many solutions solve the
+regularized least-squares problem:
+$\min_{\bx} \|\by-A\bx\|_2^2 + \lambda^2 J(\bx)$,
+where $\|\cdot\|_2$ denotes the $L_2$ norm, $\lambda$ is a
+regularization parameter, and $J(\bx)$ is a penalization functional.
+In $L_2$ norm minimization, which is a widely used solution to linear
+inference problem, $J(\bx) = \|\bx\|_2^2$. In $L_1$ norm minimization,
+another commonly used scheme, $J(\bx) =
+\|\bx\|_1$ (\ie, the $L_1$ norm of $\bx$). 
+
+
+Other regularization terms include $\|X\|_*$, the nuclear norm of
+matrix $X$, and spatio-temporal terms $\|SX\|_F^2$ and $\|XT^T\|_F^2$
+in \cite{zhang09sensing}. Unique advantages of LENS formulation
+include (i) its
+general formulation to account for a low-rank component, a sparse anomaly
+component, a dense but small noise
+term, and domain knowledge, (ii) its effective optimization
+algorithm to solve the general decomposition problem, and (iii) a
+data-driven procedure to learn the parameters. Its formulation is more
+general than existing work (\eg, \cite{zhang09sensing}) in that
+\cite{zhang09sensing} requires the original matrix to be well approximated by
+  the product of two low-rank matrices, whereas LENS relaxes this
+  constraint and allows the delta between the original matrix and
+  sparse anomaly matrix to be approximated by the product of two
+  low-rank matrices. Moreover, LENS allows a linear
+  coefficient in each of the decomposed terms and supports general
+  forms of domain knowledge.
+
+
+\section{Network Diagnosis}
+\label{sec:rel_diagnosis}
+
+There has been significant work on anomaly detection and network
+diagnosis. PCA (\eg, ~\cite{PCA1,PCA2,PCA3}) has been widely used for anomaly
+detection. \cite{PCA-sensitivity} shows that PCA is sensitive to how
+many principal components are used. \cite{PCA-data-poison} shows that
+data poisoning can significantly degrade the performance of PCA.
+%and proposes using a robust Laplace cut-off threshold to improve its
+% robustness.
+Barford et al.~\cite{barford-wavelet} uses wavelets to decompose
+an original signal into low-, mid-, and high-frequency
+components and then detect anomalies based on the high-frequency
+components. Zhang et al.~\cite{zhang09sensing} uses
+compressive sensing to discover anomalies in traffic matrices.
+\cite{anomography} develops a framework to capture a
+range of detectors. 
+% \cite{} uses risk modeling to map high-level failure
+% notifications into lower-layer root causes.
+% WISE~\cite{WISE} presents
+% a what-if analysis tool to estimate the effects of network
+% configuration changes on service response times.   %\cite{Q-score} 
+\cite{PRISM} proposes a multi-scale robust subspace algorithm to
+identify changes in performance even when the baseline is
+contaminated.  \cite{Q-score} uses ridge regression to learn Quality of
+Experience (QoE) in large-scale IPTV systems. Ridge regression does
+not work well in our context due to possible under-constraint
+issues and varying customers' response time. 
+NICE~\cite{NICE} uses
+statistical correlation to detect chronic network
+problems. Mercury~\cite{Mercury} detects persistent behavior changes
+using the time-alignment for distributed
+triggers.
+\cite{anomaly-icdcs11} combines different anomaly
+detection methods, such as EWMA, FFT, Holt-Winters, and Wavelets, to boost
+the performance. 
+
+\cite{Tiresias} uses both customer call dataset and network
+crash log in IPTV to detect anomalies. It first finds heavy hitters
+where there might be anomalies with high probability and then use EWMA
+to detect anomalies.
+
+The statistical and multi-scale analysis used in the previous works are
+complementary to our work. We complement the previous works by using
+$L_1$ minimization to select important metrics, leveraging temporal
+stability and low rank to enhance the accuracy of regression, and
+applying multiple classifiers to enhance robustness. These techniques
+can be potentially useful to other network diagnosis problems.
+
+\para{Event detection using Twitter:}
+Twitter has been extensively studied to detect various events % due to its real-time property and massive scale. 
+such as service issues~\cite{listentome, online-services}, earthquakes~\cite{earthquake}, 
+stock markets~\cite{stock2}, elections~\cite{election10}, and public health issues~\cite{publichealth}.
+\cite{listentome} shows the feasibility of social media to 
+understand user experiences and finds correlation between tweets and customer tickets. 
+% \cite{online-services} infers the online Internet 
+% service availability by tracking the volumes of tweets with the phrase ``X is down'' or the hashtag ``Xfail''.
+% They have detected outages of popular services (\eg, Gmail, Bing, PayPal). 
+\cite{online-services} detects outages of popular services (\eg, Gmail, Bing, PayPal)
+by tracking the volumes of tweets with the phrase ``X is down'' or the hashtag ``Xfail''.
+Our work takes a step further to summarize the events and localize the impacted regions 
+using detailed information from tweets. 
+
+
+\section{Anomaly Detection}
+\label{sec:rel_anomaly_det}
+
+Anomaly detection has been extensively
+studied. PCA (\eg, ~\cite{PCA1,PCA2,PCA3}) has been widely used for anomaly
+detection. PCA has several well known limitations: it is sensitive
+to how many principal components are used~\cite{PCA-sensitivity} and
+vulnerable to data poisoning~\cite{PCA-data-poison}.
+Barford et al.~\cite{barford-wavelet} uses wavelets to decompose
+an original signal into low-, mid-, and high-frequency
+components and use the high-frequency components for anomaly
+detection. \cite{anomography} presents a framework that incorporates a
+variety of anomaly detectors. \cite{zhang09sensing} uses SRMF for anomaly
+detection based on the difference between estimated and actual matrix values.

@@ -1,0 +1,26 @@
+\chapter{Conclusion and On-going Work}
+\label{chp:conclusion}
+\index{Conclusion and Future Work@\emph{Conclusion and Future Work}}
+In this work we focus on applying compressive sensing for network analytics and building systems that leverage the advantage of compressive sensing, such as anomaly detection, missing value interpolation, prediction, and activity recognition.
+
+First, we develop a systematic method to automatically detect anomalies in a
+cellular network using the customer care call data. Our approach scales to a
+large number of features in the data and is robust to 
+noise. Using evaluation based on the call records collected from a
+large cellular provider in US, we show that our method can
+achieve 68\% recall and 86\% accuracy, much better than the existing
+schemes.
+
+Second, we work on the fundamental part of compressive sensing. We present {\em LENS decomposition} to decompose a network matrix into a low-rank matrix, a sparse
+anomaly matrix, an error matrix, and a dense but small noise matrix. Our
+evaluation shows that it can effectively perform missing value
+interpolation, prediction, and anomaly detection and out-perform
+state-of-the-art approaches. As part of our future work, we plan to
+apply our framework to network tomography (\eg, traffic matrix
+estimation based on link loads and link performance estimation based
+on end-to-end performance). As part of our future work, we plan to
+apply LENS to enable several important wireless applications,
+including spectrum sensing, channel estimation, and localization.
+
+\para{On-going work:} Our on-going work is focused on making the compressive sensing technique more general to all types of network data. we observe that real-world data may not be low rank due to lack of synchronization and uniform speed. In the work, we propose a method to find the matrix transformations to synchronize and stretch/compress network data. There are many applications for such matrix transformations and we plan to extensively evaluate the performance in missing value interpolation adn activity recognition.
+
